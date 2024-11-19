@@ -1,0 +1,165 @@
+---
+title: "image classification"
+output: pdf_document
+date: "2024-11-17"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(data.table)
+library(readr)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+# a = read.csv("pixeldata-a.csv")
+b = read.csv("pixeldata-b.csv")
+c = read.csv("pixeldata-c.csv")
+d = read.csv("pixeldata-d.csv")
+e = read.csv("pixeldata-e.csv")
+f = read.csv("pixeldata-f.csv")
+g = read.csv("pixeldata-g.csv")
+h = read.csv("pixeldata-h.csv")
+i = read.csv("pixeldata-i.csv")
+j = read.csv("pixeldata-j.csv")
+k = read.csv("pixeldata-k.csv")
+l = read.csv("pixeldata-l.csv")
+m = read.csv("pixeldata-m.csv")
+n = read.csv("pixeldata-n.csv")
+o = read.csv("pixeldata-o.csv")
+p = read.csv("pixeldata-p.csv")
+q = read.csv("pixeldata-q.csv")
+r = read.csv("pixeldata-r.csv")
+s = read.csv("pixeldata-s.csv")
+t = read.csv("pixeldata-t.csv")
+u = read.csv("pixeldata-u.csv")
+v = read.csv("pixeldata-v.csv")
+w = read.csv("pixeldata-w.csv")
+x = read.csv("pixeldata-x.csv")
+y = read.csv("pixeldata-y.csv")
+z = read.csv("pixeldata-z.csv")
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+gc()
+all = rbind(a,b)
+#rm(a, b)
+#gc()
+
+addNew = function(all, letterData) {
+  all = rbind(all, letterData)
+  #gc()
+  return(all)
+}
+
+all = addNew(all, c)
+all = addNew(all, d)
+all = addNew(all, e)
+all = addNew(all, f)
+all = addNew(all, g)
+all = addNew(all, h)
+all = addNew(all, i)
+all = addNew(all, j)
+all = addNew(all, k)
+all = addNew(all, l)
+all = addNew(all, m)
+all = addNew(all, n)
+all = addNew(all, o)
+all = addNew(all, p)
+all = addNew(all, q)
+all = addNew(all, r)
+all = addNew(all, s)
+all = addNew(all, t)
+all = addNew(all, u)
+all = addNew(all, v)
+all = addNew(all, w)
+all = addNew(all, x)
+all = addNew(all, y)
+all = addNew(all, z)
+
+all[, -c(0)]
+all(names)[0] = "letter"
+write.csv(all, "lowercase_letters.csv")
+```
+
+```{r}
+all = subset(all, select = -X)
+head(all)
+write.csv(all, "lowercase_letters.csv")
+```
+
+```{r}
+all = read_csv("lowercase_letters.csv")
+head(all)
+small = all[sample(nrow(all), 10000), ]
+head(small)
+fwrite(small, "lowercase_subset_10000.csv")
+```
+
+```{r}
+# letterData = read_csv("lowercase_subset_1000.csv")
+small = small[, -c(1)]
+head(small)
+letters <- small[ ,1]
+uniqueLetters = unique(letters)
+pixels <- as.matrix(small[,-1])
+
+```
+
+```{r}
+k.out = kmeans(pixels, 26)
+table(predicted = k.out$cluster, true = letters$letters)
+```
+
+```{r}
+if(!require(ISLR)) { install.packages("ISLR", repos = "http://cran.us.r-project.org"); library("ISLR") }
+if(!require(class)) { install.packages("class", repos = "http://cran.us.r-project.org"); library("class") }
+if(!require(e1071)) { install.packages("e1071", repos = "http://cran.us.r-project.org"); library("e1071") }
+test = read_csv("lowercase_subset_1000.csv")
+```
+
+
+```{r}
+head(small)
+head(test)
+knn.pred = knn(small[, -1], test[, -c(1,2)], small$letters, k = k)
+```
+
+```{r}
+pixelMeans = data.frame(a = 1:(16384))
+
+bruh = data.frame(a = c("1","2","3"),
+                  b = c("4","5","6"),
+                  c = c("7","8","9"))
+
+meanForString = function(v) {
+  return(
+    mean(as.integer(v))
+  )
+}
+ 
+apply(bruh, 2, meanForString)
+
+
+for (letter in uniqueLetters$letters) {
+  print(letter)
+  subset = test[test$letters == letter, ]
+  print("subset oh yeah")
+  pixelMeans[, letter] = apply(subset[, -c(1,2)], 2, meanForString)
+}
+
+#what = apply(test, 2, meanForString)
+
+fwrite(pixelMeans, "pixelMeans.csv")
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
